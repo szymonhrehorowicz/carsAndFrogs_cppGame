@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>2024/05/04 11:17:56.000.146,=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2024/05/04 11:17:56.000.056,=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2024/05/04 11:18:37.000.900,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Project1PCH1.h=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Project1PCH1.h</Transaction>
+    <Transaction>2024/05/04 11:18:37.000.932,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Unit1.dfm=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Unit1.dfm</Transaction>
+    <Transaction>2024/05/04 11:18:37.000.952,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Project1.cbproj=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Project1.cbproj</Transaction>
+    <Transaction>2024/05/04 11:18:37.000.932,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Unit1.cpp=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Unit1.cpp</Transaction>
+    <Transaction>2024/05/04 11:18:37.000.932,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Unit1.h=C:\Users\Szymon\Documents\Embarcadero\Studio\Projects\Unit1.h</Transaction>
+    <Transaction>2024/05/04 11:18:42.000.473,C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Project1.cbproj=C:\PK\PROGRAMOWANIE_OBIEKTOWE\P1\Project1.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
