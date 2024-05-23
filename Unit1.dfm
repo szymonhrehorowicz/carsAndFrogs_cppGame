@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 599
-  ClientWidth = 958
+  ClientHeight = 598
+  ClientWidth = 954
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -431,6 +431,12 @@ object Form1: TForm1
       0000E0060000301D010000000000000000000000000000000000000000000000
       00000000004003C0EBEFF33F45C5821FD8AF9E700000000049454E44AE426082}
   end
+  object ImgRoadBitmap: TImage
+    Left = 0
+    Top = 222
+    Width = 960
+    Height = 128
+  end
   object Button1: TButton
     Left = 776
     Top = 488
@@ -450,7 +456,6 @@ object Form1: TForm1
     OnClick = Button2Click
   end
   object GameClock: TTimer
-    Interval = 100
     OnTimer = GameClockTimer
     Left = 40
     Top = 536

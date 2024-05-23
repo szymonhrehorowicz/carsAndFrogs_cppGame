@@ -13,6 +13,7 @@
 #include <Rpc.h>
 #include <stdio.h>
 #include <string.h>
+#include <memory.h>
 
 TForm1 *Form1;
 
@@ -27,6 +28,12 @@ TForm1 *Form1;
 
 #define ROAD_TOP 88
 #define ROAD_END 896
+
+/******************************************************************************
+
+								  VEHICLES
+
+******************************************************************************/
 
 // VEHICLE
 
@@ -160,15 +167,25 @@ Motorbike::~Motorbike()
 }
 
 
+/******************************************************************************
+
+									 GAME
+
+******************************************************************************/
+
 class Game
 {
 	public:
-    int roadMap[128][960];
+	int roadMap[128][960];
+	Graphics::TBitmap *bitmap;
+	TImage *Image1;
+
     std::map<int, Vehicle*> vehicles;
 	void updateMap();
 	void clearMap();
+    void printMap();
 
-	Game();
+	Game(TImage* Image);
     ~Game();
 };
 
@@ -182,48 +199,87 @@ void Game::updateMap()
 		int width = it.second->obj->Width;
 		int height = it.second->obj->Height;
 		int direction = it.second->velocity;
+        int x = it.second->position[POS_X];
+		int y = it.second->position[POS_Y] - ROAD_TOP;
 
-		for(size_t i = 0; i < height; i++)
+        TColor color = (TColor)RGB(255, 255, 255);
+
+		for(int i = 0; i < height; i++)
 		{
-			for(size_t j = 0; j < width; j++)
+			for(int j = 0; j < width; j++)
 			{
-                this->roadMap[i][j] = 1;
-            }
-        }
+				// Ensure the coordinates are within bounds
+                if (y + i >= 0 && y + i < 128 && x + j >= 0 && x + j < 960) {
+                    this->roadMap[y + i][x + j] = 255; // Mark the vehicle position
+				}
+			}
+		}
 	}
-    // check for animal collisions
+
+	this->printMap(); // Update the bitmap display
 }
 
 void Game::clearMap()
 {
-    for(size_t i = 0; i < 128; i++)
+    for(int i = 0; i < 128; i++)
 	{
-		for(size_t j = 0; j < 960; j++)
+		for(int j = 0; j < 960; j++)
 		{
             this->roadMap[i][j] = 0;
         }
     }
 }
 
-Game::Game()
+void Game::printMap()
 {
+    // Create a bitmap from the roadMap array
+    for(int y = 0; y < 128; y++)
+    {
+        for(int x = 0; x < 960; x++)
+        {
+            int grayValue = this->roadMap[y][x];
+            TColor color = (TColor)RGB(grayValue, grayValue, grayValue);
+            this->bitmap->Canvas->Pixels[x][y] = color;
+        }
+    }
 
+    // Display the bitmap in the TImage component
+    this->Image1->Picture->Bitmap = this->bitmap;
+}
+
+Game::Game(TImage* Image)
+{
+	this->Image1 = Image;
+	this->bitmap = new Graphics::TBitmap();
+	this->bitmap->PixelFormat = pf24bit; // Set the pixel format
+	this->bitmap->Width = 960;
+	this->bitmap->Height = 128;
+
+    this->clearMap(); // Initialize the road map to all zeros
+    this->printMap(); // Initial display
 }
 
 Game::~Game()
 {
-
+    delete this->bitmap;
 }
 
 
 
+/******************************************************************************
+
+								UI AND CLOCK
+
+******************************************************************************/
+
 int counter = 0;
-Game *game = new Game();
+Game *game;
 
 //---------------------------------------------------------------------------
 __fastcall TForm1::TForm1(TComponent* Owner)
 	: TForm(Owner)
 {
+	game = new Game(ImgRoadBitmap); // Pass the TImage component to the Game constructor
 }
 //---------------------------------------------------------------------------
 
@@ -279,4 +335,5 @@ void __fastcall TForm1::Button2Click(TObject *Sender)
     //vehicles.erase(0);
 }
 //---------------------------------------------------------------------------
+
 
