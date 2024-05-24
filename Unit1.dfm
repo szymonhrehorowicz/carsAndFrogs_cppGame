@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 598
-  ClientWidth = 954
+  ClientHeight = 580
+  ClientWidth = 942
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -456,6 +456,7 @@ object Form1: TForm1
     OnClick = Button2Click
   end
   object GameClock: TTimer
+    Interval = 100
     OnTimer = GameClockTimer
     Left = 40
     Top = 536
