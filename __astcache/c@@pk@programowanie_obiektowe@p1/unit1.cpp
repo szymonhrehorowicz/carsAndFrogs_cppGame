@@ -29,18 +29,18 @@ TForm1 *Form1;
 #define ROAD_TOP 88
 #define ROAD_END 896
 
-/*
+/******************************************************************************
 
-	VEHICLES
+								  VEHICLES
 
-*/
+******************************************************************************/
 
 // VEHICLE
 
 class Vehicle
 {
 	public:
-    std::string id;
+	int id;
 	TImage *obj;
 	int velocity;
 	unsigned int position[NO_COORDINATES];
@@ -62,7 +62,8 @@ void Vehicle::move()
 }
 void Vehicle::changeLane()
 {
-    this->position[POS_Y] += (lane == LANE_TOP ? -LANE_SIZE : LANE_SIZE);
+	this->position[POS_Y] += (velocity > 0 ? (-1*(int)LANE_SIZE) : LANE_SIZE);
+    this->obj->Top = this->position[POS_Y];
 }
 Vehicle::Vehicle(int id)
 {
@@ -167,54 +168,128 @@ Motorbike::~Motorbike()
 }
 
 
-/*
+/******************************************************************************
 
-    GAME
+									 GAME
 
-*/
+******************************************************************************/
+typedef struct
+{
+	unsigned int val;
+	int          id;
+} RoadMap_t;
 
 class Game
 {
 	public:
-	int roadMap[128][960];
+	RoadMap_t roadMap[128][960];
 	Graphics::TBitmap *bitmap;
 	TImage *Image1;
 
-    std::map<int, Vehicle*> vehicles;
+	std::map<int, Vehicle*> vehicles;
 	void updateMap();
 	void clearMap();
-    void printMap();
+	void printMap();
+	void checkForCollisions();
+    void clearVehiclesOutOfMap();
 
 	Game(TImage* Image);
-    ~Game();
+	~Game();
 };
+
+void Game::clearVehiclesOutOfMap()
+{
+	for (auto const& it : this->vehicles)
+	{
+		if(it.second->position[POS_X] > 960)
+		{
+			Vehicle *tempPointer = this->vehicles.at(it.second->id);
+			this->vehicles.erase(it.second->id);
+            delete tempPointer;
+        }
+    }
+}
+
+void Game::checkForCollisions()
+{
+	static const unsigned int X_MARGIN = 50;
+	static const unsigned int Y_MARGIN = 128 / 8;
+
+	for (auto const& it : this->vehicles)
+	{
+		int dir = it.second->velocity;
+
+		unsigned int y_position = it.second->position[POS_Y] - ROAD_TOP;
+		unsigned int x_position = it.second->position[POS_X];
+
+		int x_position_shifted_right = x_position + it.second->obj->Width + X_MARGIN;
+        int x_position_shifted_left  = x_position - X_MARGIN;
+
+		if(dir > 0 && (x_position_shifted_right < 9600))
+		{
+			// Check if something is in front of vehicle
+			if((this->roadMap[y_position][x_position_shifted_right]).val == 255)
+			{
+
+				// Check if something is above vehicle
+				if(((this->roadMap[y_position - Y_MARGIN][x_position]).val != 255) && ((2 * LANE_SIZE) != y_position))
+				{
+					// Chane lane
+					it.second->changeLane();
+				}else
+				{
+					it.second->velocity = (this->vehicles.at((this->roadMap[y_position][x_position_shifted_right]).id))->velocity;
+				}
+			}
+		}else if(dir < 0 && (x_position_shifted_left > 0))
+		{
+			// Check if something is in front of vehcile
+			if((this->roadMap[y_position][x_position_shifted_left]).val == 255)
+			{
+                // Check if something is below vehicle
+				if(((this->roadMap[y_position + it.second->obj->Height + Y_MARGIN][x_position - (it.second->obj->Width / 2)]).val != 255)
+					&& (LANE_SIZE != y_position))
+				{
+					it.second->changeLane();
+				}else
+				{
+					it.second->velocity = (this->vehicles.at((this->roadMap[y_position][x_position_shifted_left]).id))->velocity;
+				}
+			}
+        }
+	}
+}
 
 void Game::updateMap()
 {
-    // update vehicles
+	// update vehicles
 	this->clearMap();
+    this->clearVehiclesOutOfMap();
 
-    for (auto const& it : this->vehicles)
+	for (auto const& it : this->vehicles)
 	{
 		int width = it.second->obj->Width;
 		int height = it.second->obj->Height;
 		int direction = it.second->velocity;
-        int x = it.second->position[POS_X];
+		int x = it.second->position[POS_X];
 		int y = it.second->position[POS_Y] - ROAD_TOP;
 
-        TColor color = (TColor)RGB(255, 255, 255);
+		TColor color = (TColor)RGB(255, 255, 255);
 
 		for(int i = 0; i < height; i++)
 		{
 			for(int j = 0; j < width; j++)
 			{
-				this->roadMap[i][j] = 255;
-
-				this->bitmap->Canvas->Pixels[i][j] = color;
+				// Ensure the coordinates are within bounds
+				if (y + i >= 0 && y + i < 128 && x + j >= 0 && x + j < 960) {
+					(this->roadMap[y + i][x + j]).val = 255; // Mark the vehicle position
+					(this->roadMap[y + i][x + j]).id = it.second->id;
+				}
 			}
 		}
 	}
 
+    this->checkForCollisions();
 	//this->printMap(); // Update the bitmap display
 }
 
@@ -224,7 +299,7 @@ void Game::clearMap()
 	{
 		for(int j = 0; j < 960; j++)
 		{
-            this->roadMap[i][j] = 0;
+            (this->roadMap[i][j]).val = 0;
         }
     }
 }
@@ -236,9 +311,9 @@ void Game::printMap()
     {
         for(int x = 0; x < 960; x++)
         {
-            int grayValue = this->roadMap[y][x];
+            int grayValue = (this->roadMap[y][x]).val;
             TColor color = (TColor)RGB(grayValue, grayValue, grayValue);
-			this->bitmap->Canvas->Pixels[x][y] = color;
+            this->bitmap->Canvas->Pixels[x][y] = color;
         }
     }
 
@@ -254,6 +329,9 @@ Game::Game(TImage* Image)
 	this->bitmap->Width = 960;
 	this->bitmap->Height = 128;
 
+	this->Image1->Width = 0;
+    this->Image1->Height = 0;
+
     this->clearMap(); // Initialize the road map to all zeros
     this->printMap(); // Initial display
 }
@@ -265,11 +343,11 @@ Game::~Game()
 
 
 
-/*
+/******************************************************************************
 
-    UI AND CLOCK
+								UI AND CLOCK
 
-*/
+******************************************************************************/
 
 int counter = 0;
 Game *game;
@@ -282,35 +360,6 @@ __fastcall TForm1::TForm1(TComponent* Owner)
 }
 //---------------------------------------------------------------------------
 
-
-
-void __fastcall TForm1::Button1Click(TObject *Sender)
-{
-	int randomVehicle = random(3);
-
-	switch(randomVehicle)
-	{
-		case 0:
-			game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Car(counter)));
-			break;
-		case 1:
-			game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Truck(counter)));
-			break;
-		case 2:
-			game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Motorbike(counter)));
-			break;
-		default:
-			break;
-	}
-
-
-
-    counter++;
-}
-//---------------------------------------------------------------------------
-
-//---------------------------------------------------------------------------
-
 void __fastcall TForm1::GameClockTimer(TObject *Sender)
 {
 
@@ -321,18 +370,32 @@ void __fastcall TForm1::GameClockTimer(TObject *Sender)
 
     game->updateMap();
 }
+
 //---------------------------------------------------------------------------
 
 
-void __fastcall TForm1::Button2Click(TObject *Sender)
+void __fastcall TForm1::VehicleSpawnerTimer(TObject *Sender)
 {
-    for (auto const& it : game->vehicles)
+    int randomVehicle = random(3);
+	int randomSpawnVehicle = random(2);
+
+	if(randomSpawnVehicle)
 	{
-		std::cout<<it.first <<std::endl;
+		switch(randomVehicle)
+		{
+			case 0:
+				game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Car(counter)));
+				break;
+			case 1:
+				game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Truck(counter)));
+				break;
+			case 2:
+				game->vehicles.insert(std::pair<int, Vehicle*>(counter, new Motorbike(counter)));
+				break;
+			default:
+				break;
+		}
+		counter++;
 	}
-	//delete vehicles[0];
-    //vehicles.erase(0);
 }
 //---------------------------------------------------------------------------
-
-

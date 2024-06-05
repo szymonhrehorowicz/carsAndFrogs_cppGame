@@ -4,12 +4,12 @@ object Form1: TForm1
   Caption = 'Form1'
   ClientHeight = 580
   ClientWidth = 942
-  Color = clBtnFace
+  Color = clGreen
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
   Font.Height = -12
   Font.Name = 'Segoe UI'
-  Font.Style = []
+  Font.Style = [fsItalic]
   TextHeight = 15
   object road1: TImage
     Left = 0
@@ -437,28 +437,46 @@ object Form1: TForm1
     Width = 960
     Height = 128
   end
-  object Button1: TButton
-    Left = 776
-    Top = 488
-    Width = 120
-    Height = 25
-    Caption = 'Add'
-    TabOrder = 0
-    OnClick = Button1Click
+  object Label1: TLabel
+    Left = 8
+    Top = 552
+    Width = 190
+    Height = 20
+    Caption = 'Szymon Hrehorowicz 13A6'
+    Color = clGreen
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clHighlightText
+    Font.Height = 20
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold, fsItalic]
+    ParentColor = False
+    ParentFont = False
   end
-  object Button2: TButton
-    Left = 776
-    Top = 536
-    Width = 120
-    Height = 25
-    Caption = 'Del'
-    TabOrder = 1
-    OnClick = Button2Click
+  object Label2: TLabel
+    Left = 373
+    Top = 24
+    Width = 203
+    Height = 40
+    Caption = 'DEADLY ROAD'
+    Color = clGreen
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clHighlightText
+    Font.Height = 40
+    Font.Name = 'Segoe UI'
+    Font.Style = [fsBold, fsItalic]
+    ParentColor = False
+    ParentFont = False
   end
   object GameClock: TTimer
     Interval = 100
     OnTimer = GameClockTimer
-    Left = 40
-    Top = 536
+    Left = 888
+    Top = 464
+  end
+  object VehicleSpawner: TTimer
+    Interval = 500
+    OnTimer = VehicleSpawnerTimer
+    Left = 888
+    Top = 520
   end
 end

@@ -29,9 +29,7 @@ __published:	// IDE-managed Components
 	TImage *road13;
 	TImage *road14;
 	TImage *road15;
-	TButton *Button1;
 	TTimer *GameClock;
-	TButton *Button2;
 	TImage *Image1;
 	TImage *Image2;
 	TImage *Image3;
@@ -48,9 +46,11 @@ __published:	// IDE-managed Components
 	TImage *Image14;
 	TImage *Image15;
 	TImage *ImgRoadBitmap;
-	void __fastcall Button1Click(TObject *Sender);
+	TTimer *VehicleSpawner;
+	TLabel *Label1;
+	TLabel *Label2;
 	void __fastcall GameClockTimer(TObject *Sender);
-	void __fastcall Button2Click(TObject *Sender);
+	void __fastcall VehicleSpawnerTimer(TObject *Sender);
 
 private:	// User declarations
 public:		// User declarations

@@ -1,9 +1,6 @@
 ﻿[road6]
 Coordinates=245,78,47,58
 
-[Button1]
-Coordinates=74,10,59,58
-
 [road13]
 Coordinates=79,146,54,58
 
@@ -16,9 +13,6 @@ Coordinates=74,78,47,58
 [road1]
 Coordinates=378,10,47,58
 Visible=True
-
-[Button2]
-Coordinates=10,146,59,58
 
 [road2]
 Coordinates=257,10,47,58
@@ -54,5 +48,8 @@ Coordinates=10,10,54,58
 Coordinates=10,78,54,58
 
 []
-Coordinates=335,78,91,36
+Coordinates=10,146,59,58
+
+[ImgRoadBitmap]
+Visible=True
 
