@@ -49,8 +49,28 @@ __published:	// IDE-managed Components
 	TTimer *VehicleSpawner;
 	TLabel *Label1;
 	TLabel *Label2;
+	TImage *Image16;
+	TImage *Image17;
+	TImage *Image18;
+	TImage *Image19;
+	TImage *Image20;
+	TImage *Image21;
+	TImage *Image22;
+	TImage *Image23;
+	TImage *Image24;
+	TImage *Image25;
+	TImage *Image26;
+	TImage *Image27;
+	TImage *Image28;
+	TImage *Image29;
+	TImage *Image30;
+	TImage *Image31;
+	TButton *Button1;
+	TLabel *Label3;
+	TLabel *Label4;
 	void __fastcall GameClockTimer(TObject *Sender);
 	void __fastcall VehicleSpawnerTimer(TObject *Sender);
+	void __fastcall Button1Click(TObject *Sender);
 
 private:	// User declarations
 public:		// User declarations

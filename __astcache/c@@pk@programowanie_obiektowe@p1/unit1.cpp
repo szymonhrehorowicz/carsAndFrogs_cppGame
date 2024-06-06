@@ -31,6 +31,98 @@ TForm1 *Form1;
 
 /******************************************************************************
 
+								  ANIMALS
+
+******************************************************************************/
+
+// ANIMAL
+
+class Animal
+{
+	public:
+	int id;
+	TImage *obj;
+	int velocity;
+	unsigned int position[NO_COORDINATES];
+	bool alive;
+
+	void move();
+	Animal(int id);
+    ~Animal();
+};
+
+void Animal::move()
+{
+	position[POS_Y] -= velocity;
+	obj->Top -= velocity;
+}
+
+Animal::Animal(int id)
+{
+	this->id = id;
+	obj = new TImage(Form1);
+	obj->Parent = Form1;
+
+	alive = true;
+
+	int randomPosition = random(ROAD_END/2);
+
+	position[POS_X] = randomPosition + ROAD_END/4;
+	position[POS_Y] = Form1->Height - 50;
+
+	obj->Top = position[POS_Y];
+	obj->Left = position[POS_X];
+}
+
+Animal::~Animal()
+{
+	delete this->obj;
+}
+
+// FROG
+
+class Frog : public Animal
+{
+    public:
+	Frog(int id);
+    ~Frog();
+};
+
+Frog::Frog(int id) : Animal(id)
+{
+	velocity *= 1;
+
+	obj->Width  = 10;
+	obj->Height = 10;
+
+	obj->Picture->LoadFromFile("./media/frog.png");
+}
+
+Frog::~Frog() {}
+
+// ZWIERZ
+
+class Zwierz : public Animal
+{
+	public:
+	Zwierz(int id);
+	~Zwierz();
+};
+
+Zwierz::Zwierz(int id) : Animal(id)
+{
+	velocity *= 2;
+
+	obj->Width  = 20;
+	obj->Height = 20;
+
+	obj->Picture->LoadFromFile("./media/zwierz.png");
+}
+
+Zwierz::~Zwierz() {}
+
+/******************************************************************************
+
 								  VEHICLES
 
 ******************************************************************************/
@@ -45,7 +137,6 @@ class Vehicle
 	int velocity;
 	unsigned int position[NO_COORDINATES];
 	bool lane;
-    int licenseplate;
 
 	void move();
 
@@ -110,8 +201,7 @@ Car::Car(int id) : Vehicle(id)
 		obj->Picture->LoadFromFile("./media/car_rev.png");
 	}
 }
-Car::~Car()
-{}
+Car::~Car() {}
 
 // TRUCK : VEHICLE
 class Truck : public Vehicle
@@ -135,10 +225,7 @@ Truck::Truck(int id) : Vehicle(id)
 		obj->Picture->LoadFromFile("./media/truck_rev.png");
 	}
 }
-Truck::~Truck()
-{
-
-}
+Truck::~Truck() {}
 
 // MOTORBIKE : VEHICLE
 class Motorbike : public Vehicle
@@ -162,10 +249,7 @@ Motorbike::Motorbike(int id) : Vehicle(id)
 		obj->Picture->LoadFromFile("./media/motorbike_rev.png");
 	}
 }
-Motorbike::~Motorbike()
-{
-
-}
+Motorbike::~Motorbike() {}
 
 
 /******************************************************************************
@@ -187,6 +271,7 @@ class Game
 	TImage *Image1;
 
 	std::map<int, Vehicle*> vehicles;
+    std::map<int, Animal*>  animals;
 	void updateMap();
 	void clearMap();
 	void printMap();
@@ -289,6 +374,23 @@ void Game::updateMap()
 		}
 	}
 
+	for (auto const& it : this->animals)
+	{
+		int width = it.second->obj->Width;
+		int height = it.second->obj->Height;
+
+		int x = it.second->position[POS_X];
+		int y = it.second->position[POS_Y] - ROAD_TOP;
+
+		for(int i = y; i < (height + y); i++)
+		{
+			for(int j = x; j < (width + x); j++)
+			{
+                //if()
+            }
+        }
+    }
+
     this->checkForCollisions();
 	//this->printMap(); // Update the bitmap display
 }
@@ -350,6 +452,7 @@ Game::~Game()
 ******************************************************************************/
 
 int counter = 0;
+int animalCounter = 0;
 Game *game;
 
 //---------------------------------------------------------------------------
@@ -368,6 +471,10 @@ void __fastcall TForm1::GameClockTimer(TObject *Sender)
 		it.second->move();
 	}
 
+	for (auto const& it : game->animals) {
+		it.second->move();
+	}
+
     game->updateMap();
 }
 
@@ -376,10 +483,11 @@ void __fastcall TForm1::GameClockTimer(TObject *Sender)
 
 void __fastcall TForm1::VehicleSpawnerTimer(TObject *Sender)
 {
-    int randomVehicle = random(3);
-	int randomSpawnVehicle = random(2);
+	int randomVehicle = random(3);
+	int randomAnimal  = random(2);
+	int randomSpawn   = random(20);
 
-	if(randomSpawnVehicle)
+	if(randomSpawn <= 9)
 	{
 		switch(randomVehicle)
 		{
@@ -397,5 +505,27 @@ void __fastcall TForm1::VehicleSpawnerTimer(TObject *Sender)
 		}
 		counter++;
 	}
+
+	if(randomSpawn <= 4)
+	{
+		switch(randomAnimal)
+		{
+			case 0:
+				game->animals.insert(std::pair<int, Animal*>(animalCounter, new Frog(counter)));
+				break;
+			case 1:
+				game->animals.insert(std::pair<int, Animal*>(animalCounter, new Zwierz(counter)));
+				break;
+			default:
+				break;
+		}
+		
+		animalCounter++;
+    }
+}
+//---------------------------------------------------------------------------
+void __fastcall TForm1::Button1Click(TObject *Sender)
+{
+    Frog *newAnimal = new Frog(counter);
 }
 //---------------------------------------------------------------------------
