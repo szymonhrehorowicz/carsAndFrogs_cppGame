@@ -2,8 +2,8 @@ object Form1: TForm1
   Left = 0
   Top = 0
   Caption = 'Form1'
-  ClientHeight = 579
-  ClientWidth = 938
+  ClientHeight = 578
+  ClientWidth = 934
   Color = clGreen
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -995,7 +995,7 @@ object Form1: TForm1
       778092B500E9E7D4BE388C6E00700D8F3B582E2857E9BEB1363084E600B0872F
       09665D29C40FAF87B85F092A287C0000000049454E44AE426082}
   end
-  object Label3: TLabel
+  object SurvivorsLabel: TLabel
     Left = 16
     Top = 239
     Width = 83
@@ -1010,7 +1010,7 @@ object Form1: TForm1
     ParentColor = False
     ParentFont = False
   end
-  object Label4: TLabel
+  object VictimsLabel: TLabel
     Left = 16
     Top = 265
     Width = 71
@@ -1024,15 +1024,6 @@ object Form1: TForm1
     Font.Style = [fsBold, fsItalic]
     ParentColor = False
     ParentFont = False
-  end
-  object Button1: TButton
-    Left = 456
-    Top = 456
-    Width = 75
-    Height = 25
-    Caption = 'Button1'
-    TabOrder = 0
-    OnClick = Button1Click
   end
   object GameClock: TTimer
     Interval = 100

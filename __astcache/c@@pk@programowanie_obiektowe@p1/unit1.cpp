@@ -22,6 +22,9 @@ TForm1 *Form1;
 #define POS_X		   0
 #define POS_Y 		   1
 
+#define SURVIVORS 0
+#define VICTIMS   1
+
 #define LANE_TOP    0
 #define LANE_BOTTOM 1
 #define LANE_SIZE   32
@@ -47,9 +50,20 @@ class Animal
 	bool alive;
 
 	void move();
+	void die();
 	Animal(int id);
     ~Animal();
 };
+
+void Animal::die()
+{
+	this->alive	= false;
+	this->velocity = 0;
+	this->obj->Width  = 20;
+	this->obj->Height = 20;
+
+	this->obj->Picture->LoadFromFile("./media/dead.png");
+}	
 
 void Animal::move()
 {
@@ -83,7 +97,7 @@ Animal::~Animal()
 
 class Frog : public Animal
 {
-    public:
+	public:
 	Frog(int id);
     ~Frog();
 };
@@ -270,17 +284,70 @@ class Game
 	Graphics::TBitmap *bitmap;
 	TImage *Image1;
 
+	int stats[2];
+
 	std::map<int, Vehicle*> vehicles;
-    std::map<int, Animal*>  animals;
+	std::map<int, Animal*>  animals;
 	void updateMap();
 	void clearMap();
 	void printMap();
 	void checkForCollisions();
-    void clearVehiclesOutOfMap();
+	void clearVehiclesOutOfMap();
+	void clearAnimalsOutOfMap();
+	void updateStats();
+	void checkForAnimalCollisions();
 
 	Game(TImage* Image);
 	~Game();
 };
+
+void Game::checkForAnimalCollisions()
+{
+	for (auto const& it : this->animals)
+	{
+		int width = it.second->obj->Width;
+		int height = it.second->obj->Height;
+
+		int x = it.second->position[POS_X];
+		int y = it.second->position[POS_Y] - ROAD_TOP;
+
+		if((y < (4 * LANE_SIZE)) && (y > 0))
+		{
+			if((this->roadMap[y][x].val == 255) && (it.second->alive == true))
+			{
+				it.second->die();
+				this->stats[VICTIMS] += 1;
+            }
+		}
+	}
+}
+
+void Game::updateStats()
+{
+	std::string survivors_str = "Survivors: " + std::to_string(this->stats[SURVIVORS]);
+	std::string victims_str   = "Victims: "   + std::to_string(this->stats[VICTIMS]);
+	
+	System::String survivors = *(new String(survivors_str.c_str()));
+	System::String victims   = *(new String(victims_str.c_str()));
+
+	Form1->SurvivorsLabel->Caption = survivors;
+	Form1->VictimsLabel->Caption   = victims;
+}
+
+void Game::clearAnimalsOutOfMap()
+{
+	for(auto const& it : this->animals)
+	{
+		if((it.second->alive == true) && (it.second->position[POS_Y] <= 10))
+		{
+			//Animal *tempPointer = this->animals.at(it.second->id);
+			//this->animals.erase(it.second->id);
+			//delete tempPointer;
+			this->stats[SURVIVORS] += 1;
+			it.second->alive = false;
+		}
+	}
+}
 
 void Game::clearVehiclesOutOfMap()
 {
@@ -290,7 +357,7 @@ void Game::clearVehiclesOutOfMap()
 		{
 			Vehicle *tempPointer = this->vehicles.at(it.second->id);
 			this->vehicles.erase(it.second->id);
-            delete tempPointer;
+			delete tempPointer;
         }
     }
 }
@@ -310,7 +377,7 @@ void Game::checkForCollisions()
 		int x_position_shifted_right = x_position + it.second->obj->Width + X_MARGIN;
         int x_position_shifted_left  = x_position - X_MARGIN;
 
-		if(dir > 0 && (x_position_shifted_right < 9600))
+		if(dir > 0 && (x_position_shifted_right < 960))
 		{
 			// Check if something is in front of vehicle
 			if((this->roadMap[y_position][x_position_shifted_right]).val == 255)
@@ -349,7 +416,8 @@ void Game::updateMap()
 {
 	// update vehicles
 	this->clearMap();
-    this->clearVehiclesOutOfMap();
+	this->clearVehiclesOutOfMap();
+	this->clearAnimalsOutOfMap();
 
 	for (auto const& it : this->vehicles)
 	{
@@ -374,24 +442,10 @@ void Game::updateMap()
 		}
 	}
 
-	for (auto const& it : this->animals)
-	{
-		int width = it.second->obj->Width;
-		int height = it.second->obj->Height;
+	this->checkForAnimalCollisions();
 
-		int x = it.second->position[POS_X];
-		int y = it.second->position[POS_Y] - ROAD_TOP;
-
-		for(int i = y; i < (height + y); i++)
-		{
-			for(int j = x; j < (width + x); j++)
-			{
-                //if()
-            }
-        }
-    }
-
-    this->checkForCollisions();
+	this->checkForCollisions();
+	this->updateStats();
 	//this->printMap(); // Update the bitmap display
 }
 
@@ -435,12 +489,30 @@ Game::Game(TImage* Image)
     this->Image1->Height = 0;
 
     this->clearMap(); // Initialize the road map to all zeros
-    this->printMap(); // Initial display
+	this->printMap(); // Initial display
+
+	this->stats[SURVIVORS] = 0;
+	this->stats[VICTIMS]   = 0;
 }
 
 Game::~Game()
 {
-    delete this->bitmap;
+	delete this->bitmap;
+	delete this->Image1;
+
+	for(auto const &it : this->vehicles)
+	{
+		Vehicle *tempPointer = this->vehicles.at(it.second->id);
+		this->vehicles.erase(it.second->id);
+		delete tempPointer;
+	}
+
+	for(auto const& it : this->animals)
+	{
+		Animal *tempPointer = this->animals.at(it.second->id);
+		this->animals.erase(it.second->id);
+		delete tempPointer;
+	}
 }
 
 
@@ -523,9 +595,6 @@ void __fastcall TForm1::VehicleSpawnerTimer(TObject *Sender)
 		animalCounter++;
     }
 }
+
 //---------------------------------------------------------------------------
-void __fastcall TForm1::Button1Click(TObject *Sender)
-{
-    Frog *newAnimal = new Frog(counter);
-}
-//---------------------------------------------------------------------------
+

@@ -65,12 +65,10 @@ __published:	// IDE-managed Components
 	TImage *Image29;
 	TImage *Image30;
 	TImage *Image31;
-	TButton *Button1;
-	TLabel *Label3;
-	TLabel *Label4;
+	TLabel *SurvivorsLabel;
+	TLabel *VictimsLabel;
 	void __fastcall GameClockTimer(TObject *Sender);
 	void __fastcall VehicleSpawnerTimer(TObject *Sender);
-	void __fastcall Button1Click(TObject *Sender);
 
 private:	// User declarations
 public:		// User declarations
